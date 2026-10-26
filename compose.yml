@@ -1,0 +1,9 @@
+services:
+  sudoku:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sudoku-cli
+    stdin_open: true
+    tty: true
+    restart: "no"
