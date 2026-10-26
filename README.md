@@ -2,6 +2,17 @@
 
 This project is a Sudoku game that runs in a command-line terminal. Each time the application starts, it generates a new Sudoku puzzle, displays the board, and lets the player place numbers, clear entries, request hints, check for rule violations, or start another game.
 
+## Run the game with Docker
+
+Start Docker Desktop or the Docker Engine, open a terminal in the project folder, and run:
+
+```bash
+docker compose build --no-cache
+docker compose run --rm sudoku
+```
+
+The first command builds the Docker image. The second starts the interactive Sudoku game.
+
 The project is written in C# and targets .NET 11. It can run directly with the .NET SDK or inside Docker.
 
 ## Requirements
