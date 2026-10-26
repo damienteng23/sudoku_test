@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "HC0zIG/6XhA=",
+  "dgSpecHash": "YIn/v23DbYQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\damie\\source\\repos\\sudoku_test\\sudoku.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\damie\\.nuget\\packages\\microsoft.aspnetcore.openapi\\11.0.0-rc.3.26522.148\\microsoft.aspnetcore.openapi.11.0.0-rc.3.26522.148.nupkg.sha512",
-    "C:\\Users\\damie\\.nuget\\packages\\microsoft.openapi\\3.10.2\\microsoft.openapi.3.10.2.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

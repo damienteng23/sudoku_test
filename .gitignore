@@ -1,0 +1,30 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio and Rider user files
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test results and coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Generated files
+GeneratedFiles/
+
+# Local environment and secrets
+.env
+.env.*
+appsettings.Local.json
+appsettings.*.Local.json
+
+# Operating-system files
+.DS_Store
+Thumbs.db
