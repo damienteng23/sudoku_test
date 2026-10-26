@@ -1,0 +1,11 @@
+@sudoku_HostAddress = http://localhost:5280
+
+GET {{sudoku_HostAddress}}/openapi/v1.json
+Accept: application/json
+
+###
+
+GET {{sudoku_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
