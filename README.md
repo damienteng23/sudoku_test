@@ -147,8 +147,6 @@ More clues generally make a puzzle easier. Fewer clues generally make it harder.
 
 The current generator creates a valid solution and removes values, but it does not count solutions to guarantee that the remaining clues have exactly one possible solution. The game still accepts any completed board that passes Sudoku validation.
 
-## Docker
- 
 ## Automated tests
 
 With the .NET SDK installed, run from the project folder:
