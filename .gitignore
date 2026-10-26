@@ -1,11 +1,13 @@
 # Build output
 bin/
 obj/
+build-check/
 
 # Visual Studio and Rider user files
 .vs/
 .idea/
 *.user
+*.csproj.user
 *.suo
 *.userosscache
 *.sln.docstates

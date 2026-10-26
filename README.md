@@ -159,48 +159,6 @@ dotnet test sudoku.slnx
 
 The `tests/Sudoku.Tests` project checks puzzle generation, clue protection, placement and clearing, number validation, duplicate detection, hints, completion, and command parsing. An end-to-end test runs the console application with redirected input, completes a puzzle, starts another game, and quits.
 
-## Docker
-
-Build the image from the project directory:
-
-```bash
-docker compose build
-```
-
-Run the game interactively:
-
-```bash
-docker compose run --rm sudoku
-```
-
-The `--rm` option removes the temporary container when the game exits.
-
-You can rebuild and run after source changes with:
-
-```bash
-docker compose run --build --rm sudoku
-```
-
-The Compose service can also be started in the background:
-
-```bash
-docker compose up -d
-```
-
-Because Sudoku is an interactive program, attach to the running service with:
-
-```bash
-docker compose attach sudoku
-```
-
-For normal play, `docker compose run --rm sudoku` is simpler because it connects your terminal immediately.
-
-Stop and remove Compose resources with:
-
-```bash
-docker compose down
-```
-
 ## Git and generated files
 
 `.gitignore` excludes generated build output and local IDE files, including:
