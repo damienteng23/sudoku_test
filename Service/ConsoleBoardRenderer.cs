@@ -17,7 +17,7 @@ namespace sudoku.Service
                 for (int column = 0; column < SudokuGrid.Size; column++)
                 {
                     int value = grid.GetValue(new CellPosition(row, column));
-                    Console.Write(value == 0 ? "." : value.ToString());
+                    Console.Write(value == 0 ? "_" : value.ToString());
 
                     if (column == 2 || column == 5)
                         Console.Write(" | ");

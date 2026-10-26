@@ -10,7 +10,7 @@ while (true)
     SudokuGame game = new SudokuGame(puzzle);
     CommandParser parser = new CommandParser();
 
-    Console.Clear();
+    Console.WriteLine();
     Console.WriteLine("Sudoku command-line game");
     Console.WriteLine("Type 'help' for commands.");
     ConsoleBoardRenderer.Display(game.Grid);
@@ -58,7 +58,7 @@ while (true)
         }
         else if (command.Type == CommandTypeEnum.Hint)
         {
-            DisplayMoveResult(game.Hint());
+            DisplayHintResult(game.Hint());
             ConsoleBoardRenderer.Display(game.Grid);
         }
         else if (command.Type == CommandTypeEnum.Check)
@@ -66,7 +66,7 @@ while (true)
             DisplayViolations(game.Check());
         }
 
-        if (game.IsComplete(game.Grid))
+        if (game.IsComplete())
         {
             Console.WriteLine("Congratulations! You completed a valid Sudoku.");
             gameEnded = true;
@@ -101,7 +101,26 @@ static void DisplayMoveResult(MoveResult result)
         return;
     }
 
-    Console.WriteLine("Move rejected: " + result.Error);
+    string location = result.Position is { } position ? $" at {position}" : string.Empty;
+    string message = result.Error switch
+    {
+        MoveErrorEnum.PreFilledCell => $"Invalid move. {result.Position} is pre-filled.",
+        MoveErrorEnum.NumberOutOfRange => $"Invalid move{location}. Enter a number from 1 to 9.",
+        MoveErrorEnum.AlreadyComplete => "The puzzle is already complete.",
+        _ => $"Move rejected{location}: {result.Error}."
+    };
+    Console.WriteLine(message);
+}
+
+static void DisplayHintResult(MoveResult result)
+{
+    if (result.Accepted && result.Position is { } position && result.Number is { } number)
+    {
+        Console.WriteLine($"Hint: Cell {position} = {number}");
+        return;
+    }
+
+    DisplayMoveResult(result);
 }
 
 static void DisplayViolations(IReadOnlyList<RuleViolation> violations)
@@ -114,7 +133,13 @@ static void DisplayViolations(IReadOnlyList<RuleViolation> violations)
 
     foreach (RuleViolation violation in violations)
     {
-        Console.WriteLine(
-            $"{violation.Unit} {violation.UnitIndex + 1} contains duplicate number {violation.Number}.");
+        string unit = violation.Unit switch
+        {
+            UnitTypeEnum.Row => $"Row {(char)('A' + violation.UnitIndex)}",
+            UnitTypeEnum.Column => $"Column {violation.UnitIndex + 1}",
+            UnitTypeEnum.Box => $"Box {violation.UnitIndex + 1}",
+            _ => violation.Unit.ToString()
+        };
+        Console.WriteLine($"Number {violation.Number} already exists in {unit}.");
     }
 }

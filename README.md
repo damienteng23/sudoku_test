@@ -34,13 +34,13 @@ The application generates a puzzle and displays a board similar to:
 ```text
     1 2 3   4 5 6   7 8 9
   +-------+-------+-------+
-A | . . . | . 9 7 | . . . |
-B | . 4 . | . 1 . | 9 5 . |
-C | 5 9 . | 6 . . | . 2 8 |
+A | _ _ _ | _ 9 7 | _ _ _ |
+B | _ 4 _ | _ 1 _ | 9 5 _ |
+C | 5 9 _ | 6 _ _ | _ 2 8 |
   +-------+-------+-------+
 ```
 
-Rows are labelled `A` through `I`, columns are numbered `1` through `9`, and `.` represents an empty cell.
+Rows are labelled `A` through `I`, columns are numbered `1` through `9`, and `_` represents an empty cell.
 
 ## Commands
 
@@ -86,7 +86,7 @@ Contains the main game objects:
 
 - `SudokuGame.cs` controls gameplay, placement, clearing, hints, completion, and validation.
 - `SudokuPuzzle.cs` stores the original clues and the generated solution.
-- `SudokuPuzzleFactory.cs` creates the default or randomized puzzle data.
+- `SudokuPuzzleFactory.cs` creates randomized puzzle data.
 
 ```text
 Enum/
@@ -146,6 +146,18 @@ SudokuPuzzle harder = SudokuPuzzleFactory.CreateRandom(25);
 More clues generally make a puzzle easier. Fewer clues generally make it harder.
 
 The current generator creates a valid solution and removes values, but it does not count solutions to guarantee that the remaining clues have exactly one possible solution. The game still accepts any completed board that passes Sudoku validation.
+
+## Docker
+ 
+## Automated tests
+
+With the .NET SDK installed, run from the project folder:
+
+```bash
+dotnet test sudoku.slnx
+```
+
+The `tests/Sudoku.Tests` project checks puzzle generation, clue protection, placement and clearing, number validation, duplicate detection, hints, completion, and command parsing. An end-to-end test runs the console application with redirected input, completes a puzzle, starts another game, and quits.
 
 ## Docker
 

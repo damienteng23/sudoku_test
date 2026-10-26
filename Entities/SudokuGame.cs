@@ -1,4 +1,5 @@
 using sudoku.Enum;
+using sudoku.Service;
 using sudoku.ValueObject;
 
 namespace sudoku.Entities
@@ -8,17 +9,25 @@ namespace sudoku.Entities
     {
         private readonly SudokuPuzzle puzzle;
 
-        public SudokuGrid Grid { get; private set; }
+        private SudokuGrid grid;
 
-        public bool IsComplete(SudokuGrid Grid)
+        public SudokuGrid Grid
         {
-            return Grid.GetFilledCount() == SudokuGrid.CellCount && Check().Count == 0;
+            get
+            {
+                return new SudokuGrid(grid.GetArray());
+            }
+        }
+
+        public bool IsComplete()
+        {
+            return grid.GetFilledCount() == SudokuGrid.CellCount && Check().Count == 0;
         }
 
         public SudokuGame(SudokuPuzzle puzzle)
         {
             this.puzzle = puzzle ?? throw new ArgumentNullException(nameof(puzzle));
-            Grid = new SudokuGrid(puzzle.Clues.GetArray());
+            grid = new SudokuGrid(puzzle.Clues.GetArray());
         }
 
         public MoveResult Place(CellPosition position, int number)
@@ -29,7 +38,7 @@ namespace sudoku.Entities
             if (number < 1 || number > 9)
                 return new MoveResult(MoveErrorEnum.NumberOutOfRange, position);
 
-            Grid.SetValue(position, number);
+            grid.SetValue(position, number);
             return new MoveResult(MoveErrorEnum.None, position, number);
         }
 
@@ -38,24 +47,13 @@ namespace sudoku.Entities
             if (puzzle.Clues.GetValue(position) != 0)
                 return new MoveResult(MoveErrorEnum.PreFilledCell, position);
 
-            Grid.SetValue(position, 0);
+            grid.SetValue(position, 0);
             return new MoveResult(MoveErrorEnum.None, position);
         }
 
         public IReadOnlyList<RuleViolation> Check()
         {
-            var violations = new List<RuleViolation>();
-
-            for (int row = 0; row < SudokuGrid.Size; row++)
-                AddViolation(violations, UnitTypeEnum.Row, row, GetRow(row));
-
-            for (int column = 0; column < SudokuGrid.Size; column++)
-                AddViolation(violations, UnitTypeEnum.Column, column, GetColumn(column));
-
-            for (int box = 0; box < SudokuGrid.Size; box++)
-                AddViolation(violations, UnitTypeEnum.Box, box, GetBox(box));
-
-            return violations;
+            return GridValidator.Validate(grid);
         }
 
         public MoveResult Hint()
@@ -65,7 +63,7 @@ namespace sudoku.Entities
                 var position = new CellPosition(index / SudokuGrid.Size, index % SudokuGrid.Size);
 
                 if (puzzle.Clues.GetValue(position) == 0 &&
-                    Grid.GetValue(position) != puzzle.Solution.GetValue(position))
+                    grid.GetValue(position) != puzzle.Solution.GetValue(position))
                 {
                     return Place(position, puzzle.Solution.GetValue(position));
                 }
@@ -74,44 +72,5 @@ namespace sudoku.Entities
             return new MoveResult(MoveErrorEnum.AlreadyComplete);
         }
 
-        private int[] GetRow(int row)
-        {
-            var values = new int[SudokuGrid.Size];
-            for (int column = 0; column < SudokuGrid.Size; column++)
-                values[column] = Grid.GetValue(new CellPosition(row, column));
-            return values;
-        }
-
-        private int[] GetColumn(int column)
-        {
-            var values = new int[SudokuGrid.Size];
-            for (int row = 0; row < SudokuGrid.Size; row++)
-                values[row] = Grid.GetValue(new CellPosition(row, column));
-            return values;
-        }
-
-        private int[] GetBox(int box)
-        {
-            var values = new int[SudokuGrid.Size];
-            int startRow = box / 3 * 3;
-            int startColumn = box % 3 * 3;
-            int index = 0;
-
-            for (int row = startRow; row < startRow + 3; row++)
-                for (int column = startColumn; column < startColumn + 3; column++)
-                    values[index++] = Grid.GetValue(new CellPosition(row, column));
-
-            return values;
-        }
-
-        private static void AddViolation(List<RuleViolation> violations, UnitTypeEnum unit, int unitIndex, int[] values)
-        {
-            for (int number = 1; number <= 9; number++)
-            {
-                int occurrences = values.Count(value => value == number);
-                if (occurrences > 1)
-                    violations.Add(new RuleViolation(unit, unitIndex, number));
-            }
-        }
     }
 }
