@@ -4,67 +4,82 @@ using sudoku.Model;
 using sudoku.Service;
 using sudoku.ValueObject;
 
-SudokuPuzzle puzzle = SudokuPuzzleFactory.CreateRandom(30);
-SudokuGame game = new SudokuGame(puzzle);
-CommandParser parser = new CommandParser();
-
-Console.WriteLine("Sudoku command-line game");
-Console.WriteLine("Type 'help' for commands.");
-ConsoleBoardRenderer.Display(game.Grid);
-
 while (true)
 {
-    Console.Write("> ");
-    string? input = Console.ReadLine();
+    SudokuPuzzle puzzle = SudokuPuzzleFactory.CreateRandom(30);
+    SudokuGame game = new SudokuGame(puzzle);
+    CommandParser parser = new CommandParser();
 
-    if (input == null)
+    Console.Clear();
+    Console.WriteLine("Sudoku command-line game");
+    Console.WriteLine("Type 'help' for commands.");
+    ConsoleBoardRenderer.Display(game.Grid);
+
+    bool gameEnded = false;
+
+    while (!gameEnded)
+    {
+        Console.Write("> ");
+        string? input = Console.ReadLine();
+
+        if (input == null)
+        {
+            return;
+        }
+
+        GameCommand? command = parser.Parse(input);
+
+        if (command == null)
+        {
+            Console.WriteLine("Invalid command. Type 'help' for examples.");
+            continue;
+        }
+
+        if (command.Type == CommandTypeEnum.Quit)
+        {
+            return;
+        }
+
+        if (command.Type == CommandTypeEnum.Help)
+        {
+            DisplayHelp();
+            continue;
+        }
+
+        if (command.Type == CommandTypeEnum.Place && command.Position is { } placePosition)
+        {
+            DisplayMoveResult(game.Place(placePosition, command.Number));
+            ConsoleBoardRenderer.Display(game.Grid);
+        }
+        else if (command.Type == CommandTypeEnum.Clear && command.Position is { } clearPosition)
+        {
+            DisplayMoveResult(game.Clear(clearPosition));
+            ConsoleBoardRenderer.Display(game.Grid);
+        }
+        else if (command.Type == CommandTypeEnum.Hint)
+        {
+            DisplayMoveResult(game.Hint());
+            ConsoleBoardRenderer.Display(game.Grid);
+        }
+        else if (command.Type == CommandTypeEnum.Check)
+        {
+            DisplayViolations(game.Check());
+        }
+
+        if (game.IsComplete(game.Grid))
+        {
+            Console.WriteLine("Congratulations! You completed a valid Sudoku.");
+            gameEnded = true;
+        }
+    }
+
+    Console.Write("Start a new game? (y/n): ");
+    string? answer = Console.ReadLine();
+
+    if (!string.Equals(answer, "y", StringComparison.OrdinalIgnoreCase))
+    {
         break;
-
-    GameCommand? command = parser.Parse(input);
-
-    if (command == null)
-    {
-        Console.WriteLine("Invalid command. Type 'help' for examples.");
-        continue;
     }
-
-    if (command.Type == CommandTypeEnum.Quit)
-        break;
-
-    if (command.Type == CommandTypeEnum.Help)
-    {
-        DisplayHelp();
-        continue;
-    }
-
-    if (command.Type == CommandTypeEnum.Place && command.Position is { } placePosition)
-    {
-        DisplayMoveResult(game.Place(placePosition, command.Number));
-        ConsoleBoardRenderer.Display(game.Grid);
-    }
-    else if (command.Type == CommandTypeEnum.Clear && command.Position is { } clearPosition)
-    {
-        DisplayMoveResult(game.Clear(clearPosition));
-        ConsoleBoardRenderer.Display(game.Grid);
-    }
-    else if (command.Type == CommandTypeEnum.Hint)
-    {
-        DisplayMoveResult(game.Hint());
-        ConsoleBoardRenderer.Display(game.Grid);
-    }
-    else if (command.Type == CommandTypeEnum.Check)
-    {
-        IReadOnlyList<RuleViolation> violations = game.Check();
-
-        if (violations.Count == 0)
-            Console.WriteLine("No rule violations found.");
-        else
-            foreach (RuleViolation violation in violations)
-                Console.WriteLine($"{violation.Unit} {violation.UnitIndex + 1} contains duplicate number {violation.Number}.");
-    }
-
-    if (game.IsComplete(game.Grid))
-        Console.WriteLine("Congratulations! You completed a valid Sudoku.");
 }
 
 static void DisplayHelp()
@@ -87,4 +102,19 @@ static void DisplayMoveResult(MoveResult result)
     }
 
     Console.WriteLine("Move rejected: " + result.Error);
+}
+
+static void DisplayViolations(IReadOnlyList<RuleViolation> violations)
+{
+    if (violations.Count == 0)
+    {
+        Console.WriteLine("No rule violations found.");
+        return;
+    }
+
+    foreach (RuleViolation violation in violations)
+    {
+        Console.WriteLine(
+            $"{violation.Unit} {violation.UnitIndex + 1} contains duplicate number {violation.Number}.");
+    }
 }
